@@ -1,0 +1,34 @@
+
+    form {
+    display: inline-block;
+}
+tr:hover{
+    background-color: #ddd;
+    color: black;
+}
+
+.search-container select {
+    float: left;
+    border: none;
+    margin-top: 8px;
+    margin-right: 16px;
+    font-size: 17px;
+}
+
+.search-container {
+  float: right;
+}
+
+.search-container input[type=submit] {
+  float: right;
+  margin-top: 8px;
+  margin-right: 16px;
+  background: #ddd;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+}
+
+body {
+    background: linear-gradient(to right, rgba(128,128,128,.8), rgba(128,128,128,.3));
+}
