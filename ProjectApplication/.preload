@@ -1,0 +1,269 @@
+-- SECTION RELATING TO DATABASE CREATION
+su=require"sqlutil" -- Load SQL utility library
+local sqlQueries = require("ProjectApplication.lua.sqlQuery") -- loads custom query builder function list. 
+if not su.exist"file" then
+   -- Create a database environment object and open data/file.sqlite.db
+   local env,conn = su.open"file"
+   local sql="CREATE TABLE company(CompanyName   varchar(20) NOT NULL,"
+ .."street        text(10)    NOT NULL,"
+ .."city          text(6)     NOT NULL,"
+ .."postc         text(7)     NOT NULL,"
+ .."email         text(30)    NOT NULL,"
+ .."ContactNumber text(15)    NOT NULL,"
+ .."CONSTRAINT c1 PRIMARY KEY(CompanyName));"
+ 
+ local ok,err=conn:execute(sql)
+    if ok then 
+      print("Database file created in ",su.dir())
+      print("Company Table created")
+    else
+      trace("Creating DB failed",err)
+    end
+    
+    sql ="CREATE TABLE permissions(PermissionLevel varchar(255),"
+ .."viewAllDevices         int NOT NULL,"
+ .."viewAllUsers           int NOT NULL,"
+ .."changeUserSettings     int NOT NULL,"
+ .."viewCompanyUsers       int NOT NULL,"
+ .."addNewNonCompanyUsers  int NOT NULL,"
+ .."addCompanyUsers        int NOT NULL,"
+ .."addNewCompany          int NOT NULL,"
+ .."addNewDevice           int NOT NULL,"
+ .."changeDeviceSettings   int NOT NULL,"
+ .."isManufacturerEmployee int NOT NULL,"
+ .."isRoot                 int NOT NULL,"
+ .."CONSTRAINT c2 PRIMARY KEY(PermissionLevel));"
+ 
+ ok,err=conn:execute(sql)
+    if ok then 
+      print("Permissions Table Created")
+    else
+      trace("Creating permissions table failed ",err)
+    end
+    
+
+ sql ="CREATE TABLE users(UserID INTEGER PRIMARY KEY AUTOINCREMENT,"
+ .."username        text(255)    NOT NULL,"
+ .."password        text(255)    NOT NULL,"
+ .."PasswordExpiry  date        NOT NULL,"
+ .."CompanyName     varchar(255) NOT NULL,"
+ .."ContactNumber   text(255),"
+ .."email           text(255) UNIQUE NOT NULL,"
+ .."PermissionLevel varchar(255)         NOT NULL,"
+ .."CONSTRAINT c3 FOREIGN KEY(CompanyName) "
+ .."REFERENCES company(CompanyName) ON DELETE CASCADE ON UPDATE CASCADE,"
+ .."CONSTRAINT c4 FOREIGN KEY(PermissionLevel) "
+ .."REFERENCES permissions(PermissionLevel) ON DELETE CASCADE ON UPDATE CASCADE);"
+ 
+ ok,err=conn:execute(sql)
+    if ok then 
+      print("Users table created")
+    else
+      trace("Creating users table failed ",err)
+    end
+ 
+ sql="CREATE TABLE device"
+ .."(deviceIP varchar(50) NOT NULL,"
+ .."companyName varchar(20) NOT NULL,"
+ .."deviceModel  text(50) NOT NULL,"
+ .."MaintenanceDate date,"
+ .."CONSTRAINT c5 PRIMARY KEY(deviceIP),"
+ .."CONSTRAINT c6 FOREIGN KEY(companyName) "
+ .."REFERENCES company(companyName)"
+ .."ON UPDATE CASCADE ON DELETE CASCADE);"
+ 
+ ok,err=conn:execute(sql)
+    if ok then 
+      print("Device table created")
+    else
+      trace("Creating device table failed ",err)
+    end
+ 
+ sql="CREATE TABLE operatingSettings"
+ .."(settingNo int NOT NULL,"
+ .."deviceInput1 int NOT NULL,"
+ .."deviceInput2 int,"
+ .."CONSTRAINT c7 PRIMARY KEY(settingNo));"
+ 
+ ok,err=conn:execute(sql)
+    if ok then 
+      print("operating settings table created")
+    else
+      trace("Creating operating settings table failed ",err)
+    end
+ 
+ sql="CREATE TABLE userlogs"
+ .."(Email varchar(255) NOT NULL,"
+ .."time date NOT NULL,"
+ .."message text(255),"
+ .."CONSTRAINT c8 PRIMARY KEY(Email,time),"
+ .."CONSTRAINT c9 FOREIGN KEY(Email) "
+ .."REFERENCES users(Email));"
+ 
+ ok,err=conn:execute(sql)
+    if ok then 
+      print("user logs table created")
+    else
+      trace("Creating user logs table failed ",err)
+    end
+
+ sql = "CREATE TABLE devicereadings"
+ .."(deviceIP varchar(50) NOT NULL,"
+ .."readings int NOT NULL,"
+ .."readingstarttime date NOT NULL,"
+ .."readingnumber int NOT NULL,"
+ .."CONSTRAINT c10 PRIMARY KEY(deviceIP,readingstarttime,readingnumber),"
+ .."CONSTRAINT c11 FOREIGN KEY(deviceIP) "
+ .."REFERENCES device(deviceIP));"
+ 
+      ok,err=conn:execute(sql)
+    if ok then 
+      print("device reading table created")
+    else
+      trace("device reading table failed ",err)
+    end
+ 
+  sql = "CREATE TABLE deviceerrors"
+ .."(deviceIP varchar(50) NOT NULL,"
+ .."error varchar(50) NOT NULL,"
+ .."errortime date NOT NULL,"
+ .."resolved int NOT NULL,"
+ .."CONSTRAINT c12 PRIMARY KEY(deviceIP,errortime),"
+ .."CONSTRAINT c13 FOREIGN KEY(deviceIP) "
+ .."REFERENCES device(deviceIP));"
+     
+     ok,err=conn:execute(sql)
+    if ok then 
+      print("device error log table created")
+    else
+      trace("device error log table failed ",err)
+    end
+    
+    
+    
+    
+    sql="INSERT INTO company VALUES('Chameleon','Tuam Business Park, Weir Road','Tuam','H54 CH79','sales@chameleon.ie','+353 93 25392');"
+
+   
+  ok, err = conn:execute(sql)
+    if ok then 
+        print("Root company created")
+    else
+        trace("Root company create failed")
+    end
+    
+    sql="INSERT INTO permissions VALUES('Root',1,1,1,1,1,1,1,1,1,1,1);"
+
+   
+  ok, err = conn:execute(sql)
+    if ok then 
+        print("Permission Settings created")
+    else
+        trace("Permission Settings create failed")
+    end
+    sql="INSERT INTO permissions VALUES('Technical User',1,1,0,1,0,1,1,1,1,1,0);"
+
+  ok, err = conn:execute(sql)
+    if ok then 
+        print("Permission Settings created")
+    else
+        trace("Permission Settings create failed")
+    end
+    sql="INSERT INTO permissions VALUES('Admin',1,1,1,1,1,1,1,0,1,1,0);"
+      ok, err = conn:execute(sql)
+    if ok then 
+        print("Permission Settings created")
+    else
+        trace("Permission Settings create failed")
+    end
+    
+    sql="INSERT INTO permissions VALUES('Manufacturer Employee',1,1,0,1,0,0,0,0,1,1,0);"
+      ok, err = conn:execute(sql)
+    if ok then 
+        print("Permission Settings created")
+    else
+        trace("Permission Settings create failed")
+    end
+    sql="INSERT INTO permissions VALUES('Customer Admin', 0,0,1,1,0,1,0,1,1,0,0);"
+      ok, err = conn:execute(sql)
+    if ok then 
+        print("Permission Settings created")
+    else
+        trace("Permission Settings create failed")
+    end
+    sql="INSERT INTO permissions VALUES('Customer Employee', 0,0,0,1,0,0,0,0,0,0,0);"
+      ok, err = conn:execute(sql)
+    if ok then 
+        print("Permission Settings created")
+    else
+        trace("Permission Settings create failed")
+    end
+    
+    
+    
+    
+    sql = "INSERT INTO users(username,password,PasswordExpiry,CompanyName,ContactNumber,Email,permissionlevel)"
+     .. "VALUES('G. Root','COM810',0,'Chameleon','000000000','root','Root');"
+    
+    ok, err = conn:execute(sql)
+    if ok then 
+        print("Root user created")
+    else
+        trace("Root user create failed")
+    end
+    
+    su.close(env,conn)
+end
+
+
+
+
+
+
+
+
+ -- SECTION RELATING TO SERVER SIDE BROKER CREATION FOR THE FACILITATION OF H2M & M2M COMMUNICATION
+
+_G.smq = require("smqbroker").create()
+
+local function smqEntry(_ENV)
+
+   smq.connect(request)
+
+end
+if not _G.mySmqBrokerDir then
+    local smqDir = ba.create.dir("Server-Broker-Test8")
+    smqDir:setfunc(smqEntry)
+    smqDir:insert()
+    trace("Installing broker entry at:",smqDir:baseuri())
+    trace(mySmqBrokerDir)
+    _G.mySmqBrokerDir = smqDir
+end
+
+local function checkcompany(device,ptid)
+    local value = ba.json.decode(device)
+    if value then 
+        local sql = selectQueryWhere({"companyname"},"device","deviceIP",value.ipaddr); 
+
+        local function execute(cur)
+            company = cur:fetch()
+            return true
+        end
+        
+        local function opendb() 
+            return su.open("file")
+        end
+        
+        local ok,err=su.select(opendb,string.format(sql), execute)
+        
+        if not ok then 
+            trace("ERROR ", err)
+        end
+        if company then 
+            trace(smq.publish(company.."\0",ptid))
+        end
+    end
+end
+
+smq.subscribe("nocompany",{onmsg=checkcompany});
+
