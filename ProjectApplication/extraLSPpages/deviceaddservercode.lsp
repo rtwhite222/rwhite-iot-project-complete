@@ -11,7 +11,7 @@
     local su=require"sqlutil"
     local env,conn = su.open"file"
     local sql = insertQuery(deviceData,"device")
-    trace(sql)
+    
     ok, err = conn:execute(sql)
     if ok then 
         print("Device registered")
@@ -20,22 +20,22 @@
         local env,conn = su.open"file"
         local ok,err=conn:execute(sql)
         su.close(env,conn)
-        
-        require "socket.mail" -- Load mail library
-        local mail=socket.mail{
-           shark=ba.create.sharkssl(),
-           server="smtp.gmail.com",
-           user="projectservertestemail@gmail.com",
-           password="X3hLkB0063",
-        }
+        -- Mail code intentionally commented out. Feel free to add it using your own email address as receiver if you wish to test it
+        --require "socket.mail" -- Load mail library
+        --local mail=socket.mail{
+        --   shark=ba.create.sharkssl(),
+        --   server="smtp.gmail.com",
+        --   user="projectservertestemail@gmail.com",
+        --   password="X3hLkB0063",
+        --}
          
         -- Send email
-        local ok,err=mail:send{
-           subject="Auto response message",
-           from='Project Application Server <projectservertestemail1@gmail.com>',
-           to='Richard <insertnamehere@gmail.com>', 
-           body= usersession.loggedinas.." registered a new device at "..os.date("%c", os.time()).." Registered device model:"..deviceData.deviceModel.." IP: "..deviceData.deviceIP.." Company : "..deviceData.companyName
-        }
+        --local ok,err=mail:send{
+        --   subject="Auto response message",
+        --   from='Project Application Server <projectservertestemail1@gmail.com>',
+        --   to='Richard <insertnamehere@gmail.com>', 
+        --   body= usersession.loggedinas.." registered a new device at "..os.date("%c", os.time()).." Registered device model:"..deviceData.deviceModel.." IP: "..deviceData.deviceIP.." Company : "..deviceData.companyName
+        --}
 
     else
         print("Device registration failed ",err)
