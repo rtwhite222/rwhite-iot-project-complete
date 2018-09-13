@@ -4,6 +4,8 @@ Created to be used in conjunction with the Mako Server. The server can be instal
 https://makoserver.net/download/windows/
 for windows machines.
 
+This is a non-commercial usage of Mako Server and intended for educational purposes
+
 After downloading the server, insert the **ProjectApplication** document into the saved MakoServer folder just downloaded, 
 or whatever name you decided to give it.
 
