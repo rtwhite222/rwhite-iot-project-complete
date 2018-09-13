@@ -45,10 +45,10 @@ Before starting the VM, change the network configuration to have 2 interfaces (n
 Once the VM boots, log in with the default "pi" user and password of osboxes.org (as given on the osboxes.org web site).
 
 
-Open a terminal window and create a new directory called IOT and go into it.
+Open a terminal window and create a new directory called IOT and make it your current directory.
 
-**mkdir IOT
-cd IOT**
+**mkdir IOT**
+**cd IOT**
 
 Now clone the github repsoitory for the project:
 
