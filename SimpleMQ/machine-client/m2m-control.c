@@ -1,5 +1,26 @@
 /**
  * This code has been taken and modified from the following base code:
+ * Lines 791-879 display code which was modified from the base code.
+ * The code which was changed creates a while loop and, after creating
+ * a topic to listen on, waits for a message indicating the subject the
+ * device will be registered to. After receiving the company name, the device
+ * unsubscribes from the previous topic (removing it from publishing to the 
+ * discovery list on browser connect) and subscribes to the subject
+ * from the message it received. It then breaks out of the while loop
+ * and goes into the main loop to carry out the unmodified code.
+ *
+ * This version has extra modified code (see lines 203-251) that was disabled
+ * due to the VM's inability to access hardware. On a Raspberry PI this would
+ * allow the device to output state changes to the devices (Such as if a 
+ * breadboard was connected and wired up it could turn on/off a buzzer or LED, 
+ * or whatever outputs were connected).
+ *
+ * The rest of the code, other than some function names, has remained unmodified
+ * This is code created for a non-commercial non-profit and educational purpose
+ * as a means of proof-of-concept.
+ * 
+ * 
+ * 
  *     ____             _________                __                _
  *    / __ \___  ____ _/ /_  __(_)___ ___  ___  / /   ____  ____ _(_)____
  *   / /_/ / _ \/ __ `/ / / / / / __ `__ \/ _ \/ /   / __ \/ __ `/ / ___/
