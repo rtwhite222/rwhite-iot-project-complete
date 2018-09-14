@@ -82,3 +82,5 @@ Run the executable
 **./machine-smq**
 
 The device should now show up in the webserver's device discovery page!
+
+The device-side code in its unedited form can be found at https://embedded-app-server.info/IoT.lsp
