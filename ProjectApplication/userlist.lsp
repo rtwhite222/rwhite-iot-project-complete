@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<!-- User List Page - This page is designed for users view other users in the system and acts a means of accessing
+     their user profile page -->
 <html>
     <head>
         <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
