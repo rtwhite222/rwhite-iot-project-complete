@@ -25,6 +25,10 @@
                 end
                 checkLogin()
             ?>
+            // This code has aspects adapted from the Mako Server example
+            // found at https://simplemq.com/m2m-led/
+            // In particular, the builder functions for the LEDs, the escapeHtml function, the temp function
+            
             // Code adapted from Mako Server example - cleans code to ensure
             // no possibility of scripting attacks
             function escapeHtml(unsafe) {
