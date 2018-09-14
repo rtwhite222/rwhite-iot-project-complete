@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Add User Page - This page is designed for users to fill out a form to add a new user into the system -->
 <html>
     <?lsp
         -- Makes sure the user is logged in
