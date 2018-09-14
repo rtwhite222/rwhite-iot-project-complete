@@ -223,7 +223,7 @@ end
 
 
  -- SECTION RELATING TO SERVER SIDE BROKER CREATION FOR THE FACILITATION OF H2M & M2M COMMUNICATION
-
+ -- Broker directory and broker create
 _G.smq = require("smqbroker").create()
 
 local function smqEntry(_ENV)
@@ -236,10 +236,11 @@ if not _G.mySmqBrokerDir then
     smqDir:setfunc(smqEntry)
     smqDir:insert()
     trace("Installing broker entry at:",smqDir:baseuri())
-    trace(mySmqBrokerDir)
     _G.mySmqBrokerDir = smqDir
 end
 
+-- Function used to check if a device is registered to a company, if not, does nothing, if does, sends
+-- company name to device
 local function checkcompany(device,ptid)
     local value = ba.json.decode(device)
     if value then 
@@ -260,10 +261,11 @@ local function checkcompany(device,ptid)
             trace("ERROR ", err)
         end
         if company then 
-            trace(smq.publish(company.."\0",ptid))
+            smq.publish(company.."\0",ptid)
         end
     end
 end
 
+-- subscribe listener for device
 smq.subscribe("nocompany",{onmsg=checkcompany});
 
