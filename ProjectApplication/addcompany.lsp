@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Add Company Page - This page is designed for users to fill out a form to add a new company into the system -->
 <html>
     <head>
         <meta charset="UTF-8"/>
