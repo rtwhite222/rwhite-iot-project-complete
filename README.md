@@ -18,7 +18,7 @@ to access the project's website.
 On start, a database will be created with a root user in place, log in using 'root' and 'COM810' as the password.
 
 
-#Installing and using the Raspberry Pi "Raspian" Linux as a hardware simulator.
+# Installing and using the Raspberry Pi "Raspian" Linux as a hardware simulator.
 
 Download and install Oracle VirtualBox from https://www.virtualbox.org/wiki/Downloads
 Download and unpack Raspian VM (Virtual Disk Image) from https://www.osboxes.org/raspbian
