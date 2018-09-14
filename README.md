@@ -17,6 +17,9 @@ to access the project's website.
 
 On start, a database will be created with a root user in place, log in using 'root' and 'COM810' as the password.
 
+** If you are using windows 10, be sure to add the https:// prefix and allow access to the website to prevent
+   issues with websocket connection**
+** If the devices and add devices pages provide a disconnected error message, also add the https:// prefix **
 
 # Installing and using the Raspberry Pi "Raspian" Linux as a hardware simulator.
 
