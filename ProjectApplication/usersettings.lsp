@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+<!-- User Settings Page - This page holds the user profile page, the code used to change the user settings and the
+     method used to view the user's usage logs -->
 <html>
     <head>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
