@@ -24,12 +24,12 @@
             <div class="content-container-user-company">
             <!-- Form used to create company  -->
             <form method="post">
-                Company Name * <br><input type="text" name="CompanyName" required><br>
-                Street<br><input type="text" name="street"><br>
-                City<br><input type="text" name="city"><br>
-                Postcode<br><input type="text" name="postc"><br>
-                Company Email * <br><input type="text" name="email" required><br>
-                Company Phone * <br><input type="text" name="ContactNumber" required><br> 
+                Company Name * <br><input type="text" name="CompanyName" required placeholder = "Enter Company Name"><br>
+                Street<br><input type="text" name="street" placeholder = "Enter Street"><br>
+                City<br><input type="text" name="city" placeholder = "Enter City"><br>
+                Postcode<br><input type="text" name="postc" placeholder = "Enter Postcode"><br>
+                Company Email * <br><input type="text" name="email" required placeholder = "Enter Company Email"><br>
+                Company Phone * <br><input type="text" name="ContactNumber" required placeholder = "Enter Contact Number"><br> 
                 <input type="submit" value="Create Company Profile">
             </form>
     
