@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- Add Device Page - This page is designed for users to add new devices to the system -->
  
 <html>
     <head>
