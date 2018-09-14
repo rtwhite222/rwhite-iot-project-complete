@@ -1,6 +1,9 @@
 <!DOCTYPE html>
-
-<html>
+<!-- Device list page - This page is designed to allow the browser to connect to and 
+     change settings of devices currently connected to the system. This includes changing pins,
+     viewing device settings, statistics (currently not implemented device side),
+     error logs (currently not implemented device side). Functionality to be included: current
+     device run values -->
 
     <head>
         <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
