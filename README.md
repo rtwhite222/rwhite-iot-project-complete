@@ -22,7 +22,9 @@ On start, a database will be created with a root user in place, log in using 'ro
 
 Download and install Oracle VirtualBox from https://www.virtualbox.org/wiki/Downloads
 Download and unpack Raspian VM (Virtual Disk Image) from https://www.osboxes.org/raspbian
+
 Run VirtualBox.
+
     Select "New"
         Name = Raspian
         Type = Linux
