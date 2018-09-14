@@ -6,7 +6,7 @@ for windows machines.
 
 
 
-After downloading the server, insert the **ProjectApplication** document into the saved MakoServer folder just downloaded, 
+After downloading the server, insert the **ProjectApplication** folder into the saved MakoServer folder just downloaded, 
 or whatever name you decided to give it.
 
 If you use the command prompt to access the MakoServer document after saving it, you can use the command
