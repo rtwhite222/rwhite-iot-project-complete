@@ -135,6 +135,8 @@ static const char* simpleMqUrl; /* defaults to SIMPLEMQ_DOMAIN */
 #define KEY_DOWN_ARROW 1001
 #define DEBUG 1
 static int currentTemperature=0; /* simulated value */
+static char deviceTorque[256] = "500";
+static char deviceRunTime[256]="120";
 
 void
 _xprintf(const char* fmt, ...)
@@ -168,11 +170,11 @@ static const MachineInfo machineInfo[] = {
       1
    },
    {
-      "Paint sensor 1",
+      "Motor Up",
       2
    },
    {
-      "Paint sensor 2",
+      "Motor Down",
       3
    },
    {
@@ -491,6 +493,14 @@ int getTemp(void)
 {
    return currentTemperature;
 }
+const char* getTorque(void)
+{
+   return deviceTorque;
+}
+const char* getRunTime(void)
+{
+   return deviceRunTime;
+}
 
 
 const char* getDevName(void)
@@ -657,6 +667,10 @@ sendDevInfo(SharkMQ* smq, const char* ipaddr, U32 tid, U32 subtid, const char* c
    SharkMQ_wrtstr(smq, ipaddr);
    SharkMQ_wrtstr(smq, "\",\"devname\":\"");
    SharkMQ_wrtstr(smq, getDevName());
+   SharkMQ_wrtstr(smq, "\",\"torque\":\"");
+   SharkMQ_wrtstr(smq, getTorque());
+   SharkMQ_wrtstr(smq, "\",\"runTime\":\"");
+   SharkMQ_wrtstr(smq, getRunTime());
    SharkMQ_wrtstr(smq, "\",\"company\":\"");
    SharkMQ_wrtstr(smq, company);
    SharkMQ_wrtstr(smq, "\",\"leds\":[");
@@ -727,6 +741,8 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
        const char* smqUniqueId, int smqUniqueIdLen)
 {
    U32 displayTid=0;    /* Topic ID (Tid) for "/m2m/led/display" */
+   U32 torqueTid=0;
+   U32 timeTid=0;
    U32 ledSubTid=0;     /* Sub Topic ID for "led" */
    U32 deviceTid=0;     /* Tid for "/m2m/led/device" */
    U32 devInfoSubTid=0; /* Sub Topic ID for "devinfo" */
@@ -849,6 +865,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
       {
          if(smq->tid == smq->clientTid){
             strncpy(company, (char*)msg, strlen((char *)msg));
+            company[strlen((char *)msg)] = '\0';
             xprintf(("received company name %s\n",company));
             check = 1;
             SharkMQ_unsubscribe(smq,discoveryTid);
@@ -904,6 +921,8 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
     */
    SharkMQ_createsub(smq, "devinfo");
    SharkMQ_createsub(smq, "led");
+SharkMQ_createsub(smq, "/m2m/torque");
+SharkMQ_createsub(smq, "/m2m/time");
 
    /* Subscribe to browser "hello" messages. We send the device
     * capabilities as JSON data to the browser's ephemeral ID when we
@@ -912,7 +931,8 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
    char subtopic[80];
    sprintf(subtopic,"/m2m/led/display/%s",company);
    SharkMQ_subscribe(smq, subtopic);
-
+   /*SharkMQ_subscribe(smq, "/m2m/torque");
+   SharkMQ_subscribe(smq, "/m2m/time");*/
    int timer = 0;
    int button_state = 0;
    smq->timeout=50; /* Poll so we can locally update the GPIO buttons. */
@@ -933,7 +953,11 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
 
             /* Manage responses for create, createsub, and subscribe */
             case SMQ_SUBACK: /* ACK: "/m2m/led/display" */
-               displayTid = smq->ptid;
+               if( ! strcmp(subtopic, (char*)msg ) )
+               {
+                  displayTid = smq->ptid;
+               }
+
                break;
             case SMQ_CREATEACK:  /* ACK: "/m2m/temp" or "/m2m/led/device" */
 #ifdef ENABLE_TEMP
@@ -952,6 +976,17 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
                {  /* Ack for: SMQ_createsub(smq, "led"); */
                   ledSubTid = smq->ptid;
                }
+               else if( ! strcmp("/m2m/torque", (char*)msg ) )
+               {
+                  torqueTid = smq->ptid;
+
+               }
+               else if( ! strcmp("/m2m/time", (char*)msg ) )
+               {
+                  timeTid = smq->ptid;
+
+               }
+               
                else /* Must be ACK for devinfo */
                {  /* Ack for: SMQ_createsub(smq, "devinfo"); */
                   baAssert( ! strcmp("devinfo", (char*)msg) );
@@ -998,6 +1033,21 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
          }
          else if(smq->tid == smq->clientTid) /* sent to our ephemeral tid */
          {
+            if(smq->subtid == torqueTid)
+            {
+
+               xprintf(("Received torque value %s\n",(char*)msg));
+               strncpy(deviceTorque, (char*)msg, strlen((char *)msg));
+	       deviceTorque[strlen((char *)msg)] = '\0';
+            }
+	    else if(smq->subtid == timeTid)
+            {
+               xprintf(("Received run duration value %s\n",(char*)msg));
+               strncpy(deviceRunTime, (char*)msg, strlen((char *)msg));
+	       deviceRunTime[strlen((char *)msg)] = '\0';
+            }
+            else
+{
             msg[1] = setGPIO(msg[0], msg[1]);
 /*
             if (msg[1] == 1)
@@ -1023,6 +1073,7 @@ m2mled(SharkMQ* smq, SharkSslCon* scon,
             outData[1] = msg[1];
             /* Publish to "/m2m/led/device", sub-topic "led" */
             SharkMQ_publish(smq, outData, 2, deviceTid, ledSubTid);
+         }
          }
          else
          {
