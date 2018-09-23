@@ -6,4 +6,9 @@
     local ok,err=conn:execute(sql)
     if ok then print"The device has been removed. Restart it for the changes to take effect" end
     su.close(env,conn)
+    usersession = request:session()
+        sql= "INSERT INTO userlogs VALUES('"..usersession.loggedinas.."','"..os.time().."','Deleted device - <br> - Model:"..deviceData.deviceModel.." <br> - IP: "..deviceData.deviceIP.."');"
+        local env,conn = su.open"file"
+        local ok,err=conn:execute(sql)
+        su.close(env,conn)
 ?>
