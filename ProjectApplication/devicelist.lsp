@@ -8,7 +8,7 @@
     <head>
         <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
         <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="cssfiles/devicepages.css?version=34">
+        <link rel="stylesheet" href="cssfiles/devicepages.css?version=41">
         <meta charset="UTF-8" />
         <title>Devices Page</title>
         <meta name=viewport content="width=device-width, initial-scale=1" />
@@ -91,7 +91,7 @@
             // Displays a string concatenating torque to its recommended SI units of Nm. Rest of these functions are similar
             function runtime2html(runtime) {
             
-                return "Run time left: " + runtime
+                return "Run time: " + runtime + "s"
             }
             // If no devices are connected, print this message in place of the device list
             function printNoDevs() {
@@ -163,7 +163,7 @@
                 // On device message of its parameters, builds the device profile browser side
                 function devInfo(info, ptid) {
                     var html=        
-                    ("<tr class='clickable-row' id = 'device-"+ptid+"' data-href='usersettings.lsp'>"+
+                    ("<tr class='clickable-row' id = 'device-"+ptid+"'>"+
                         "<td width='10' align='center'>"+
                             "<i class='fa fa-2x fa-warning fw white-warning' id='device-warning-"+ptid+"'></i>"+   
                         "</td>"+
@@ -327,7 +327,7 @@
                     for(var i=0 ; i < leds.length; i++) {
                         // TR contains: TD for name + TD for LED + TD for LED on/off switch
                         devicetabhtml += 
-                                        ('<tr>' + mkLedName(leds[i].name) + 
+                                        ('<tr class = "nohover">' + mkLedName(leds[i].name) + 
                                             mkLed(ptid, leds[i].id, leds[i].color,leds[i].on) +
                                             mkLedSwitch(ptid, leds[i].id, leds[i].on) +
                                         '</tr>');
@@ -336,25 +336,39 @@
                      
                      
                      // Current values are not used, set to 0 to be adapted in later possible versions
-                     info.torque = 0;
-                     info.runtime = 0;
+
             
                     
             
                     devicetabhtml+= '<div class = "readout-container" >'
                         devicetabhtml+='<div class="device-reading" id="temp-'+ptid+'">'+temp2html(info.temp)+'</div><br>'
                         devicetabhtml+='<div class="device-reading" id="torque-'+ptid+'">'+torque2html(info.torque)+'</div><br>'
-                        devicetabhtml+='<div class="device-reading" id="runtime-'+ptid+'">'+runtime2html(info.runtime)+'</div><br>'
+                        devicetabhtml+='<div class="device-reading" id="runtime-'+ptid+'">'+runtime2html(info.runTime)+'</div><br>'
                     devicetabhtml+= '</div>'
                     devicetabhtml+= '</div>';
                     $("#deviceInfo-"+ptid).append(devicetabhtml);
                     
                     // Builds the buttons used to store the device error, device runtime test generators. Also builds the button for 
                     // removing the device from the database
-                    devicetabhtml = '<div>';
-                    devicetabhtml +='<button class="settings-btn" type = "submit" id = "test-error-sub'+ptid+'">Generate Error</button></div>';
-                    devicetabhtml +='<button class="settings-btn" type = "submit" id = "test-settings-sub'+ptid+'">Generate device run settings</button></div>';
-                    devicetabhtml +='<button class="settings-btn" type = "submit" id = "removeDevice'+ptid+'">Remove Device</button>';
+                    devicetabhtml = '<table class="table-users table small-margin" border="0"><tbody>'
+                    
+                    devicetabhtml += '<div>';
+                    devicetabhtml += '<tr class="nohover">'
+                    devicetabhtml +='<td>Set Device Torque:</td>';
+                    devicetabhtml +='<td><input type="number" min=300 max=1600 class="small-btn" id = "torque-value-'+ptid+'" placeholder = "Enter Torque (N \u22C5 m)"></td>';
+                    devicetabhtml +='<td><button class="small-btn" type = "submit" id = "torque-sub'+ptid+'">Set Torque</button></td></tr>';
+                    
+                    devicetabhtml += '<tr class="nohover">'
+                    devicetabhtml += '<td>Set Run Duration:</td>';
+                    devicetabhtml +='<td><input type="number" min=30 max=240 class="small-btn" id = "duration-'+ptid+'" placeholder = "Enter Run Duration (s)"></td>';
+                    devicetabhtml +='<td><button class="small-btn" type = "submit" id = "duration-sub'+ptid+'">Set Duration</button></td></tr>';
+                    devicetabhtml += '</tbody></table>'
+            
+                    devicetabhtml += '<table class="table-users table small-margin" border="0"><tbody>'
+                    devicetabhtml +='<tr class="nohover"><td><button class="settings-btn" type = "submit" id = "test-error-sub'+ptid+'">Generate Error</button></td></tr>';
+                    devicetabhtml +='<tr class="nohover"><td><button class="settings-btn" type = "submit" id = "test-settings-sub'+ptid+'">Generate device run settings</button></td></tr>';
+                    devicetabhtml +='<tr class="nohover"><td><button class="settings-btn" type = "submit" id = "removeDevice'+ptid+'">Remove Device</button></td><tr>';
+                    devicetabhtml += '</tbody></table>'
                     devicetabhtml +='</div>';
                     $("#deviceRunParams-"+ptid).append(devicetabhtml);
                     
@@ -370,6 +384,53 @@
                           }
                         });
                         
+                    });
+                    
+                    $("#torque-sub"+ptid).click(function(ev) {
+                        // this is where you would publish to the device
+                        var torqueVal = $("#torque-value-"+ptid).val()
+                        if (torqueVal >= 300 && torqueVal <= 1600){
+                            var torquedata = '{"ptid":"'+ptid+'", "value":"'+torqueVal+'"}'
+                            
+                            smq.publish(torquedata,"/m2m/torque/display");
+                            smq.publish(torqueVal+ "\0",ptid,"/m2m/torque");
+                            $.ajax({
+                                type: "POST",
+                                url: "extraLSPpages/changedevicesettings.lsp",
+                                data: {deviceIP:info.ipaddr, deviceModel:escapeHtml(info.devname),setting:"torque", value:torqueVal},
+                                success: function(output) {
+                                    alert(output);
+                                }
+                            });
+                            var torqueId='#torque-'+ptid;
+                            $(torqueId).html(torque2html(torqueVal));
+                            }
+                        else{
+                            alert("Please enter a valid torque value in the range 300 to 1600");
+                        }
+                    });
+                    
+                    $("#duration-sub"+ptid).click(function(ev) {
+                        var durationVal = $("#duration-"+ptid).val();
+                        if (durationVal >= 30 && durationVal <= 240){
+                            var timedata = '{"ptid":"'+ptid+'", "value":"'+durationVal+'"}';
+                            
+                            smq.publish(timedata,"/m2m/time/display");
+                            smq.publish(durationVal+ "\0",ptid,"/m2m/time");
+                            $.ajax({
+                                type: "POST",
+                                url: "extraLSPpages/changedevicesettings.lsp",
+                                data: {deviceIP:info.ipaddr, deviceModel:escapeHtml(info.devname),setting:"run time", value:durationVal},
+                                success: function(output) {
+                                    alert(output);
+                                }
+                            });
+                            var timeId='#runtime-'+ptid; 
+                            $(timeId).html(runtime2html(durationVal));
+                            }
+                        else{
+                            alert("Please enter a valid time value in the range 30 to 240");
+                        }
                     });
                     
                     // Generates new data run results
@@ -403,7 +464,7 @@
                         $.ajax({
                           type: "POST",
                           url: "extraLSPpages/removedevicecode.lsp",
-                          data: {deviceIP:info.ipaddr},
+                          data: {deviceIP:info.ipaddr, deviceModel:escapeHtml(info.devname)},
                         success: function(output) {
                               alert(output);
                           }
@@ -459,15 +520,13 @@
                 };
                 // Currently unused - On torque change, changes torque in device info
                 function onTorque(data, ptid) {
-                    var b = new Uint8Array(data,0,2);
-                    var torque = (new DataView(b.buffer)).getInt16(0);
-                    var torqueId='#torque-'+ptid;
-                    $(torqueId).html(torque2html(torque));
+                    var torqueId='#torque-'+data.ptid;
+                    $(torqueId).html(torque2html(data.value));
                 };
                 // Currently unused - Countdown for device run time
                 function onTimeLeft(data, ptid) {
-                    var timeId='#runtime-'+data; 
-                    $(timeId).html(runtime2html(data));
+                    var timeId='#runtime-'+data.ptid; 
+                    $(timeId).html(runtime2html(data.value));
             
                 };
                 
@@ -475,8 +534,8 @@
                     // Subscribes to device's temperatures
                     smq.subscribe("/m2m/temp", {"onmsg":onTemp});
                     // Currently unused ///////////
-                    smq.subscribe("/m2m/torque", {"onmsg":onTorque});
-                    smq.subscribe("/m2m/time", {"datatype":"text","onmsg":onTimeLeft});
+                    smq.subscribe("/m2m/torque/display", {"datatype":"json","onmsg":onTorque});
+                    smq.subscribe("/m2m/time/display", {"datatype":"json","onmsg":onTimeLeft});
                     ///////////////////////////////
                     
                     // If response message is sent from device to this browser, builds the device info sent

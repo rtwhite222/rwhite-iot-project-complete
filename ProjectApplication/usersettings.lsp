@@ -198,12 +198,14 @@
                 <br> Keep in mind that this new value will be used to sign you in
             </form></div>
         </div>
-     <div class = "setting-modal" id ="edit-permission">
+        <?lsp if tonumber(usersession.isRoot) == 1 then ?>
+        <div class = "setting-modal" id ="edit-permission">
             <div class="modal-interior">
             <form method="post"><span class="close" id="edit-permission-close">&times;</span>
                 Password: <br><input type="password" name="passwordCheck" placeholder = "Please enter your password" required><br>
                 Permission Level:<br> <select name="permissionlevel" required>
                 <option value=""></option>
+                
     <?lsp
     -- builds list of options for the select statement for user permissions
     local sql
@@ -229,6 +231,7 @@
                  <input type="submit" value="Update Permission">
             </form></div>
         </div>
+        <?lsp end ?>
     <script>
         // This code is what functions to open and close the tabs on the page. It was
         // adapted from a tutorial - https://www.w3schools.com/howto/howto_js_tabs.asp
@@ -272,10 +275,11 @@
         document.getElementById("email-popup").onclick = function() {
             document.getElementById('edit-email').style.display = "block";
         } 
+        <?lsp if tonumber(usersession.isRoot) == 1 then ?>
         document.getElementById("permission-popup").onclick = function() {
             document.getElementById('edit-permission').style.display = "block";
         } 
-        
+        <?lsp end ?>
         
         // Gives the close buttons the ability to close the modals
         document.getElementById("change-password-close").onclick = function() {
@@ -290,10 +294,10 @@
         document.getElementById("edit-email-close").onclick = function() {
             document.getElementById('edit-email').style.display = "none";
         } 
+        <?lsp if tonumber(usersession.isRoot) == 1 then ?>
         document.getElementById("edit-permission-close").onclick = function() {
             document.getElementById('edit-permission').style.display = "none";
-        } 
-        
+        } <?lsp end ?>
         // If the window is clicked, checks if one of the modal containers were clicked.
         // If they were, close the corresponding modal
         window.onclick = function(event) {
@@ -309,9 +313,12 @@
             if (event.target == document.getElementById('edit-email')) {
                 document.getElementById('edit-email').style.display = "none";
             }
+            <?lsp if tonumber(usersession.isRoot) == 1 then ?>
             if (event.target == document.getElementById('edit-permission')) {
                 document.getElementById('edit-permission').style.display = "none";
             }
+            <?lsp end ?>
+            
         }
     
     </script>
