@@ -57,7 +57,7 @@ $(ODIR):
 	mkdir $(ODIR)
 
 machine-smq$(EXT): $(ODIR)/m2m-control$(O) $(LIBNAME)
-	$(CC) $(LNKOFT)$@ $< -L. -lSimpleMQ $(EXTRALIBS)
+	$(CC) $(LNKOFT)$@ $< -L. -lwiringPi -lSimpleMQ $(EXTRALIBS)
 
 $(LIBNAME):  $(SOURCE:%.c=$(ODIR)/%$(O))
 	$(AR) $(ARFLAGS) $(AROFT)$@ $^

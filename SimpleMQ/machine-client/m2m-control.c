@@ -102,6 +102,7 @@
 #include "hardware-control.h"
 #include <ctype.h>
 #include <stdlib.h>
+#include "wiringPi.h"
 
 
 
@@ -134,6 +135,9 @@ static const char* simpleMqUrl; /* defaults to SIMPLEMQ_DOMAIN */
 #define KEY_UP_ARROW 1000
 #define KEY_DOWN_ARROW 1001
 #define DEBUG 1
+
+#define GPIOID_MIN (2)
+#define GPIOID_MAX (3)
 static int currentTemperature=0; /* simulated value */
 static char deviceTorque[256] = "500";
 static char deviceRunTime[256]="120";
@@ -216,24 +220,17 @@ int
 setGPIO(int GPIOId, int on)
 {
    // int gpioPins [17] = {4,5,6,12,13,16,17,18,19,20,21,22,23,24,25,26,27};
+   int gpioPins [2] = {18,24};
    if(GPIOId >= 1 && GPIOId <= sizeof(machineInfo)/sizeof(machineInfo[1]))
    {
-      printf("Set GPIO %d %s\n", GPIOId, on ? "on" : "off");
-      gpios[GPIOId-1] = on;
-      // wiringPiSetupGpio();
-      // pinMode(gpioPins[GPIOId-1],OUTPUT);
-      // digitalWrite(gpioPins[GPIOId-1],on);
-      if(GPIOId-1 == 7 && (gpios[0] == 0 || (gpios[1] == 0 && gpios[2] == 0))){
-         /*Sleep(5000);*/
-         on = 0;
-         // digitalWrite(gpioPins[GPIOId-1],on);
-      }
-      /*else if(gpios[1] == 1 
+      printf("Received input value %d %s\n", GPIOId, on ? "on" : "off");
+      if (GPIOId >= GPIOID_MIN && GPIOId <= GPIOID_MAX)
       {
-         gpios[]
-      }*/
-
-      /* If door is opened, turn off gpio pins */
+         gpios[GPIOId-2] = on;
+         wiringPiSetupGpio();
+         pinMode(gpioPins[GPIOId-2],OUTPUT);
+         digitalWrite(gpioPins[GPIOId-2],on);
+      }
 
 /*
  * Commented out for use in VM (no hardware to simulate!)
